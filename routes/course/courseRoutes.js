@@ -8,16 +8,12 @@ const { addToCart, viewCart, removeFromCart } = require("../../controller/cartCo
 
 courseRoute.post('/courses',createCourse);
 courseRoute.post('/lessons',addLesson);
-courseRoute.post('/wishlist',addToWishlist);
-courseRoute.post('/cart',addToCart);
 courseRoute.post('/ratings',rateCourse);
 courseRoute.post('/certificate/generate',handleCertificate);
 
 
 courseRoute.get('/courses',getCourses);
-courseRoute.get('/courses/basic-info',verifyUser,getBasicCourseInfo);
-courseRoute.get('/wishlist',getWishlist);
-courseRoute.get('/cart',viewCart);
+courseRoute.get('/courses/basic-info',getBasicCourseInfo);
 courseRoute.get('/tutor-courses/:tutorId',getCoursesByTutorId);  
 courseRoute.get('/user-courses/:userId',getCoursesByStudentId);  
 courseRoute.get('/course/:id',viewCourse)
@@ -35,8 +31,7 @@ courseRoute.put('/course/:id/edit',editCourse);
 
 courseRoute.delete('/course',deleteCourse);
 courseRoute.delete('/lesson',deleteLesson);
-courseRoute.delete('/wishlist/remove',removeFromWishlist);
-courseRoute.delete('/cart/remove',removeFromCart);
+
 
 
 

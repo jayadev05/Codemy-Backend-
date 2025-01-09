@@ -15,6 +15,8 @@ const cloudinary = require("../config/cloudinaryConfig");
 const Certificate = require("../model/certificateModel");
 
 const getBasicCourseInfo = async (req, res) => {
+
+
   const {
     search,
     sortBy,
