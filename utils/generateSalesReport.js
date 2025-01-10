@@ -19,8 +19,9 @@ const generateSalesReport = async (startDate, endDate) => {
       'timestamps.createdAt': {
         $gte: new Date(startDate),
         $lte: new Date(endDate),
-      },
+      },orderStatus:'Completed'
     })
+    .sort({'timestamps.createdAt':-1})
       .populate('userId')
       .populate('courses');
 
@@ -51,9 +52,8 @@ const generateSalesReport = async (startDate, endDate) => {
 
     // Function to ensure content fits on page
     const ensureSpace = (neededSpace) => {
-      if (doc.y + neededSpace > doc.page.height - 70) { // Increased bottom margin for footer
+      if (doc.y + neededSpace > doc.page.height - 70) {
         doc.addPage();
-        // Add header to new page
         doc
           .fontSize(12)
           .fillColor('#666666')
@@ -71,7 +71,6 @@ const generateSalesReport = async (startDate, endDate) => {
     
     doc.moveDown(0.5);
     
-    // Subtitle with period
     doc
       .fontSize(14)
       .fillColor(colors.text)
@@ -139,8 +138,8 @@ const generateSalesReport = async (startDate, endDate) => {
 
     doc.moveDown(4);
 
-    // Payment Methods Section with modern styling
-    ensureSpace(200); // Check if enough space for payment methods section
+    // Payment Methods Section
+    ensureSpace(200);
     currentY = doc.y + 20;
     doc
       .font('Helvetica-Bold')
@@ -150,18 +149,15 @@ const generateSalesReport = async (startDate, endDate) => {
 
     doc.moveDown();
 
-    // Draw modern payment methods table
     Object.entries(metrics.paymentMethods).forEach(([method, count], index) => {
       ensureSpace(40);
       const percentage = ((count / metrics.totalSales) * 100).toFixed(1);
       const y = doc.y;
       
-      // Draw row background
       doc
         .rect(50, y - 5, 500, 30)
         .fill(index % 2 === 0 ? colors.lightGray : '#FFFFFF');
       
-      // Draw text
       doc
         .fontSize(12)
         .fillColor(colors.text)
@@ -172,8 +168,8 @@ const generateSalesReport = async (startDate, endDate) => {
 
     doc.moveDown(2);
 
-    // Recent Orders Section with modern table
-    ensureSpace(400); // Check if enough space for orders table
+    // Recent Orders Section with updated table including discount
+    ensureSpace(400);
     currentY = doc.y + 20;
     doc
       .font('Helvetica-Bold')
@@ -183,50 +179,47 @@ const generateSalesReport = async (startDate, endDate) => {
 
     doc.moveDown();
 
-    // Table headers with modern styling
+    // Updated table headers with Discount column
     const tableTop = doc.y;
-    const tableHeaders = ['No.', 'Order ID', 'Date', 'Amount', 'Status'];
-    const columnWidths = [50, 120, 120, 125, 85]; // Adjusted column widths for better spacing
+    const tableHeaders = ['No.', 'Order ID', 'Date', 'Amount', 'Discount', 'Status'];
+    const columnWidths = [40, 100, 100, 100, 80, 80]; // Adjusted widths to accommodate new column
 
     // Draw header background
     doc
       .rect(50, tableTop - 5, 500, 30)
       .fill(colors.primary);
 
-    // Draw header text with padding
+    // Draw header text
     let xOffset = 60;
     tableHeaders.forEach((header, i) => {
       doc
         .fontSize(12)
         .fillColor('#FFFFFF')
-        .text(header, xOffset, tableTop + 5, { // Added vertical padding
-          width: columnWidths[i] - 10, // Subtract padding from width
-          align: i === 0 ? 'center' : 'left' // Center align the No. column
+        .text(header, xOffset, tableTop + 5, {
+          width: columnWidths[i] - 10,
+          align: i === 0 ? 'center' : 'left'
         });
       xOffset += columnWidths[i];
     });
 
-    // Table rows with alternating backgrounds
+    // Table rows with discount column
     let rowY = tableTop + 30;
-    let lastY = rowY; // Track the last row's Y position
+    let lastY = rowY;
     
     orders.slice(-10).forEach((order, index) => {
       ensureSpace(40);
       
-      // Draw row background
       doc
         .rect(50, rowY - 5, 500, 30)
         .fill(index % 2 === 0 ? colors.lightGray : '#FFFFFF');
 
-      // Reset x offset for each row
       xOffset = 60;
-
-      // Draw row content with padding
+      
       doc
         .fontSize(11)
         .fillColor(colors.text);
       
-      // Number column (centered)
+      // Number
       doc.text((index + 1).toString(), xOffset, rowY + 5, {
         width: columnWidths[0] - 10,
         align: 'center'
@@ -257,32 +250,40 @@ const generateSalesReport = async (startDate, endDate) => {
       );
       xOffset += columnWidths[3];
       
+      // Discount
+      doc.text(
+        `Rs. ${order.discount?.discountAmount || 0}`,
+        xOffset,
+        rowY + 5,
+        { width: columnWidths[4] - 10 }
+      );
+      xOffset += columnWidths[4];
+      
       // Status
       doc.text(
         order.payment.status,
         xOffset,
         rowY + 5,
-        { width: columnWidths[4] - 10 }
+        { width: columnWidths[5] - 10 }
       );
 
       rowY += 30;
-      lastY = rowY; // Update last Y position
+      lastY = rowY;
     });
 
-    // Add footer at the bottom of the last content page
+    // Footer
     doc
       .fontSize(10)
       .fillColor('#666666')
       .text(
         `Generated on: ${new Date().toLocaleString()}`,
         50,
-        lastY + 20, // Position footer relative to last row
+        lastY + 20,
         {
           align: 'center',
         }
       );
 
-    // Finalize document
     doc.end();
 
     return new Promise((resolve, reject) => {

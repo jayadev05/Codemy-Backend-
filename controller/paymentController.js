@@ -11,10 +11,10 @@ const Coupon = require('../model/couponModel');
 
 
 const createOrder = async (req, res) => {
-  const { amount, userId, courses, paymentMethod, couponCode } = req.body;
+  const { amount, userId, courses, paymentMethod, couponCode,discountAmount } = req.body;
 
   const amountInPaise = Math.round(amount * 100);
-  let discountAmount = 0;
+ 
 
   try {
     
