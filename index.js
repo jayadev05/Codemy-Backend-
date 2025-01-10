@@ -10,7 +10,7 @@ const courseRoute = require("./routes/course/courseRoutes");
 const paymentRoute = require("./routes/payment/paymentRoutes");
 const chatRoute = require("./routes/chat/chatRoutes");
 const verifyUser = require("./middleware/authMiddleware");
-require('dotenv').config;
+require("dotenv").config;
 
 const app = express();
 // Create HTTP server
@@ -18,7 +18,7 @@ const server = require("http").createServer(app);
 
 // Update CORS options to include Socket.IO specific settings
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://codemy.jayadevnair.in",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
   exposedHeaders: ["Content-Disposition"],
