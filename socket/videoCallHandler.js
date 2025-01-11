@@ -24,7 +24,7 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
         return;
       }
 
-      // Emit with callback to get error information
+     
       io.to(recieverId).emit(
         "incoming-call",
         {
@@ -44,7 +44,12 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
             });
           }
         }
+
+        
       );
+
+      console.log("Emitted incoming call to reciever");
+      
     } catch (error) {
       console.error("Error in initiate-call:", error);
       socket.emit("call-failed", {
