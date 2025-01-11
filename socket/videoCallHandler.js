@@ -15,6 +15,8 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
         callerUserId,
       } = data;
 
+      console.log(signalData);
+
       const receiverSocketId = findReceiverSocket(recieverId);
 
       if (!receiverSocketId) {
@@ -37,7 +39,9 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
         (err) => {
           if (err) {
             console.error("Failed to deliver call to receiver:", err);
-            io.to(from).emit("call-failed", { reason: "Delivery failed" });
+            io.to(callerUserId).emit("call-failed", {
+              reason: "Delivery failed",
+            });
           }
         }
       );
@@ -55,6 +59,7 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
       const { signalData, to } = data;
 
       console.log(to, "to in answer call");
+      console.log(signalData);
 
       io.to(to).emit("call-accepted", { signalData }, (err) => {
         if (err) {
