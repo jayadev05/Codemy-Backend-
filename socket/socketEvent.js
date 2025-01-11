@@ -18,8 +18,8 @@ const initializeSocket = (server) => {
       allowedHeaders: ['Content-Type', 'Authorization', 'x-refresh-token'],  
       credentials: true,
     },
-    pingTimeout: 120000,        // Increased to 2 minutes
-    pingInterval: 25000,        // Keep this as is
+    pingTimeout: 60000,      
+    pingInterval: 25000,       
     connectTimeout: 60000,      // Increased to 1 minute
   });
 

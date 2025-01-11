@@ -39,7 +39,7 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
         (err) => {
           if (err) {
             console.error("Failed to deliver call to receiver:", err);
-            io.to(callerUserId).emit("call-failed", {
+            socket.to(callerUserId).emit("call-failed", {
               reason: "Delivery failed",
             });
           }
@@ -61,7 +61,7 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
       console.log(to, "to in answer call");
       console.log(signalData);
 
-      io.to(to).emit("call-accepted", { signalData }, (err) => {
+      socket.to(to).emit("call-accepted", { signalData }, (err) => {
         if (err) {
           console.error("Failed to deliver call answer:", err);
         }
@@ -81,7 +81,7 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
       const receiverSocketId = findReceiverSocket(to);
 
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("call-rejected", null, (err) => {
+        socket.to(receiverSocketId).emit("call-rejected", null, (err) => {
           if (err) {
             console.error("Failed to deliver call rejection:", err);
           }
@@ -94,20 +94,24 @@ const videoCallHandler = (io, socket, onlineStudents, onlineTutors) => {
 
   socket.on("call-ended", (data) => {
     try {
-      const { to } = data;
-      const receiverSocketId = findReceiverSocket(to);
+        const { to } = data;
 
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("call-ended", null, (err) => {
-          if (err) {
-            console.error("Failed to deliver call end signal:", err);
-          }
-        });
-      }
+        // Find the receiver's socket ID
+        const receiverSocketId = findReceiverSocket(to);
+
+        if (receiverSocketId) {
+           
+            socket.to(receiverSocketId).timeout(5000).emit("call-ended", data);
+            console.log(`Call end signal sent to receiver: ${receiverSocketId}`);
+        } else {
+            console.error(`Receiver socket not found for ID: ${to}`);
+        }
     } catch (error) {
-      console.error("Error in call-ended:", error);
+        console.error("Error in handling call-ended event:", error);
     }
-  });
-};
+});
+
+}
+
 
 module.exports = { videoCallHandler };
