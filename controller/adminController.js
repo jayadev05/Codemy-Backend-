@@ -4,7 +4,7 @@ const Admin = require("../model/adminModel");
 const Course = require("../model/courseModel");
 const Report = require("../model/reportModel");
 const Coupon = require("../model/couponModel");
-const Blacklist = require('../model/blacklistModel')
+const Blacklist = require("../model/blacklistModel");
 const Order = require("../model/orderModel");
 const InstructorApplication = require("../model/tutorApplication");
 const Category = require("../model/categoryModel");
@@ -71,7 +71,7 @@ const forgotPassword = async (req, res) => {
     await currentUser.save();
 
     // Create reset URL
-    const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetURL = `https://codemy.jayadevnair.in/reset-password/${resetToken}`;
 
     try {
       // Attempt to send reset email
@@ -334,30 +334,31 @@ const getCertificates = async (req, res) => {
 
     // Map file extensions to MIME types
     const mimeTypes = {
-      '.pdf': 'application/pdf',
-      '.doc': 'application/msword',
-      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.png': 'image/png',
-      '.gif': 'image/gif'
+      ".pdf": "application/pdf",
+      ".doc": "application/msword",
+      ".docx":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ".jpg": "image/jpeg",
+      ".jpeg": "image/jpeg",
+      ".png": "image/png",
+      ".gif": "image/gif",
     };
 
-    const contentType = mimeTypes[fileExtension] || 'application/octet-stream';
+    const contentType = mimeTypes[fileExtension] || "application/octet-stream";
 
     // Set appropriate headers
     res.set({
-      'Content-Type': contentType,
-      'Content-Length': stats.size,
-      'Content-Disposition': 'inline',
+      "Content-Type": contentType,
+      "Content-Length": stats.size,
+      "Content-Disposition": "inline",
     });
 
     // Stream the file
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
 
-    fileStream.on('error', (streamError) => {
-      console.error('Stream error:', streamError);
+    fileStream.on("error", (streamError) => {
+      console.error("Stream error:", streamError);
       // Only send error if headers haven't been sent
       if (!res.headersSent) {
         res.status(500).json({
@@ -366,9 +367,8 @@ const getCertificates = async (req, res) => {
         });
       }
     });
-
   } catch (error) {
-    console.error('Certificate Fetch Error:', error);
+    console.error("Certificate Fetch Error:", error);
     res.status(500).json({
       success: false,
       message: "Error retrieving certificate",
@@ -405,7 +405,7 @@ const reviewInstructorApplication = async (req, res) => {
     if (status === "approved") {
       // Check if user already exists
       let existingUser = await User.findOne({ email: application.email });
-      const userId=existingUser._id;
+      const userId = existingUser._id;
 
       if (existingUser) {
         // Generate a secure random password
@@ -415,7 +415,7 @@ const reviewInstructorApplication = async (req, res) => {
         // Convert existing user to tutor
         const newTutor = new Tutor({
           ...existingUser.toObject(),
-          _id:new ObjectId(),
+          _id: new ObjectId(),
           email: application.email,
           fullName: application.fullName,
           password: hashedPassword,
@@ -431,10 +431,10 @@ const reviewInstructorApplication = async (req, res) => {
         await Blacklist.findOneAndUpdate(
           { userId },
           { invalidatedAt: new Date() },
-          { upsert: true } 
+          { upsert: true }
         );
-        
-        console.log('User blacklisted  successfully');
+
+        console.log("User blacklisted  successfully");
 
         // Delete data from user collection
         await User.findByIdAndDelete(existingUser._id);
@@ -447,7 +447,6 @@ const reviewInstructorApplication = async (req, res) => {
           );
 
           await mailSender(application.email, subject, htmlContent);
-          
         } catch (error) {
           console.error("Failed to send approval email", {
             tutorId: newTutor._id,
@@ -566,7 +565,6 @@ const existsCheck = async (req, res) => {
 };
 
 const approveTutor = async (req, res) => {
-  
   try {
     const { applicationId } = req.params;
     const { status } = req.body;
@@ -578,7 +576,7 @@ const approveTutor = async (req, res) => {
         status: status,
         updatedAt: new Date(),
       },
-      { new: true } 
+      { new: true }
     );
 
     // Check if application exists
@@ -589,14 +587,11 @@ const approveTutor = async (req, res) => {
       });
     }
 
-   
-
     res.status(200).json({
       success: true,
       message: "Tutor application processed",
-      status:status
+      status: status,
     });
-
   } catch (error) {
     console.error("Error approving tutor application:", error);
     res.status(500).json({
@@ -1146,12 +1141,10 @@ const getPayoutRequests = async (req, res) => {
       .populate("tutorId", "fullName profileImg email")
       .sort({ requestedAt: -1 });
 
-    return res
-      .status(200)
-      .json({
-        message: "Payout requests fetched successfully",
-        payoutRequests,
-      });
+    return res.status(200).json({
+      message: "Payout requests fetched successfully",
+      payoutRequests,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
@@ -1160,8 +1153,11 @@ const getPayoutRequests = async (req, res) => {
 
 const handlePayoutRequest = async (req, res) => {
   try {
-    const {type}= req.user;
-    if(type!=='admin')return res.status(401).json({message:"You are unauthorized to perform this action"})
+    const { type } = req.user;
+    if (type !== "admin")
+      return res
+        .status(401)
+        .json({ message: "You are unauthorized to perform this action" });
 
     const { action, requestId } = req.body;
 
@@ -1218,7 +1214,7 @@ const handlePayoutRequest = async (req, res) => {
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-    .sort({"timestamps.createdAt":-1})
+      .sort({ "timestamps.createdAt": -1 })
       .populate("userId", "fullName profileImg email")
       .populate({
         path: "courses",
