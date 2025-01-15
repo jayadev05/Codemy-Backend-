@@ -113,7 +113,8 @@ const verifyPayment = async (req, res) => {
     // Update student's active courses
     const updatedUser = await User.findOneAndUpdate(
       { _id: order.userId },
-      { $addToSet: { activeCourses: { $each: order.courses } } }
+      { $addToSet: { activeCourses: { $each: order.courses } } },
+       { new: true }
     );
 
    
