@@ -40,7 +40,7 @@ const getTutorsByUserId = async (req, res) => {
     const { courseIds } = req.query;
 
     if (!courseIds) {
-      return res.status(400).json({ message: "CourseIds are missing" });
+      return res.status(400).json({ message: "CourseIds are missing",req.query });
     }
 
     // Find courses and populate tutors
