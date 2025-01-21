@@ -1,4 +1,4 @@
-const { oauth2client } = require('../config/oauth'); // Import the OAuth client
+const { oauth2client } = require('../config/googleConfig'); // Import the OAuth client
 
 /**
  * Handles Google OAuth2 callback and token exchange
