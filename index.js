@@ -10,6 +10,7 @@ const courseRoute = require("./routes/course/courseRoutes");
 const paymentRoute = require("./routes/payment/paymentRoutes");
 const chatRoute = require("./routes/chat/chatRoutes");
 const verifyUser = require("./middleware/authMiddleware");
+const { googleAuthCallback } = require('../controller/authController');
 require("dotenv").config;
 
 const app = express();
@@ -55,6 +56,9 @@ app.use("/tutor", tutorRoute);
 app.use("/course", courseRoute);
 app.use("/checkout", verifyUser, paymentRoute);
 app.use("/chat", verifyUser, chatRoute);
+
+//google callback
+app.get('/oauth2callback', googleAuthCallback);
 
 // Start server
 server.listen(3000, () => {
