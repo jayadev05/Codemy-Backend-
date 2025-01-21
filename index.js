@@ -11,7 +11,7 @@ const paymentRoute = require("./routes/payment/paymentRoutes");
 const chatRoute = require("./routes/chat/chatRoutes");
 const verifyUser = require("./middleware/authMiddleware");
 const { googleAuthCallback } = require('../controller/authController');
-require("dotenv").config;
+require("dotenv").config();
 
 const app = express();
 // Create HTTP server
